@@ -6,6 +6,7 @@ import 'package:bt_tuan6/pages/action_page/add_product.dart';
 import 'package:bt_tuan6/pages/action_page/edit_product.dart';
 import 'package:flutter/material.dart';
 import 'package:quickalert/quickalert.dart';
+import 'package:intl/src/intl/number_format.dart';
 
 class ProductPage extends StatefulWidget{
 
@@ -130,9 +131,9 @@ class _ProductPage extends State<ProductPage>{
                   mainAxisSize: MainAxisSize.min,
 
                   children: [
-                    Text(productModel.name!, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),),
-                    Text("Price: ${productModel.price}", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.amberAccent[700]),),
-                    Text(productModel.desc!, maxLines: 1, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey),),
+                    SizedBox(width: 190, child: Text(productModel.name!, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),),),
+                    SizedBox(width: 190, child: Text("Price: ${NumberFormat('#,##0').format(productModel.price!)} VND", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.blueAccent),),),
+                    SizedBox(width: 150, child: Text(productModel.desc!, maxLines: 1, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.grey),),)
 
                   ],
                 )

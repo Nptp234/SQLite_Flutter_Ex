@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:bt_tuan6/data/database_service.dart';
 import 'package:bt_tuan6/models/category.dart';
+import 'package:bt_tuan6/models/dropdown_list.dart';
 import 'package:bt_tuan6/models/product.dart';
 import 'package:bt_tuan6/pages/category_page.dart';
 import 'package:flutter/cupertino.dart';
@@ -17,10 +18,10 @@ class EditProduct extends StatefulWidget{
   EditProduct({required this.productModel});
 
 
-  _EditProduct createState() => _EditProduct();
+  EditProductState createState() => EditProductState();
 }
 
-class _EditProduct extends State<EditProduct>{
+class EditProductState extends State<EditProduct>{
 
   TextEditingController nameController = TextEditingController();
   TextEditingController descController = TextEditingController();
@@ -42,7 +43,8 @@ class _EditProduct extends State<EditProduct>{
   CategoryModel categoryModel = CategoryModel();
   List<CategoryModel> listCategory = [];
   DatabaseServiceCategory databaseServiceCategory = DatabaseServiceCategory();
-  String? categoryId;
+  static String? categoryId;
+  String categoryName='';
 
   Future<List<CategoryModel>> getListCategory() async{
     // databaseServiceCategory.getCategoyList().whenComplete(() {
@@ -69,14 +71,11 @@ class _EditProduct extends State<EditProduct>{
     });
   }
 
-  String? dropdownValue;
 
   @override
   void initState() {
     super.initState();
-    // name = widget.productModel.name;
-    // desc = widget.productModel.desc;
-    // price = '${widget.productModel.price}';
+
     _productModel = widget.productModel;
     nameController.text = _productModel.name!;
     descController.text = _productModel.desc!;
@@ -86,6 +85,8 @@ class _EditProduct extends State<EditProduct>{
 
     setState(() {
       listCategory = CategoryPageState.listCategory;
+      CategoryModel _cate = CategoryPageState.listCategory.firstWhere((category) => category.id == categoryId);
+      categoryName = _cate.name!;
     });
   }
 
@@ -208,7 +209,7 @@ class _EditProduct extends State<EditProduct>{
               child: Row(
                 children: [
                   Text('Branch: ', style: TextStyle(fontSize: 17, color: Colors.black87),),
-                  _dropdownButton(context),
+                  DropdownCustom(currentCateId: categoryId,),
                 ],
               ),
             ),
@@ -239,57 +240,62 @@ class _EditProduct extends State<EditProduct>{
   }
 
   
+  String dropdownValue='';
 
-  Widget _dropdownButton(BuildContext context) {
-    // dropdownValue = listCategory.firstWhere((category) => category.id == _productModel.cateId).name;
-    return Container(
-      width: 150,
-      padding: EdgeInsets.only(left: 10, right: 10),
+  // Widget _dropdownButton(BuildContext context) {
+  //   // dropdownValue = listCategory.firstWhere((category) => category.id == _productModel.cateId).name;
+  //   return Container(
+  //     width: 150,
+  //     padding: EdgeInsets.only(left: 10, right: 10),
 
-      decoration: BoxDecoration(
-        border: Border.all(width: 2, color: Colors.grey),
-        borderRadius: BorderRadius.all(Radius.circular(5))
-      ),
+  //     decoration: BoxDecoration(
+  //       border: Border.all(width: 2, color: Colors.grey),
+  //       borderRadius: BorderRadius.all(Radius.circular(5))
+  //     ),
 
-      child: Center(
-        child: FutureBuilder<List<CategoryModel>>(
-          future: getListCategory(), // Fetch data on widget build
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
+  //     child: Center(
+  //       child: FutureBuilder<List<CategoryModel>>(
+  //         future: getListCategory(), // Fetch data on widget build
+  //         builder: (context, snapshot) {
+  //           if (snapshot.hasData) {
 
-              return DropdownButton(
-                value: dropdownValue,
-                icon: const Icon(Icons.arrow_drop_down, size: 20,),
-                elevation: 16,
-                style: const TextStyle(color: Colors.black, fontSize: 20),
+  //             // if (dropdownValue=='') {
+  //             //   dropdownValue = categoryName;
+  //             // }
+
+  //             return DropdownButton(
+  //               value: dropdownValue==''?listCategory.first.name:dropdownValue,
+  //               icon: const Icon(Icons.arrow_drop_down, size: 20,),
+  //               elevation: 16,
+  //               style: const TextStyle(color: Colors.black, fontSize: 20),
                 
-                onChanged: (String? value) {
-                  // This is called when the user selects an item.
-                  setState(() {
-                    dropdownValue = value!;
-                  });
-                },
-                items: listCategory.map<DropdownMenuItem<String>>((CategoryModel category){
-                  return DropdownMenuItem<String>(
-                    value: category.id,
-                    child: Text(category.name!),
-                    onTap: () {
-                      categoryId = category.id;
-                    },
-                  );
-                }).toList(), 
-              );
-            } 
-            else if (snapshot.hasError) {
-              return Text('Error: ${snapshot.error}'); // Handle errors
-            }
+  //               onChanged: (String? value) {
+  //                 setState(() {
+  //                   value!=null?dropdownValue = value:null;
+  //                 });
+  //               },
 
-            // Display a loading indicator while data is being fetched
-            return const Center(child: CircularProgressIndicator());
-          },
-        ),
-      ),
-    );
-  }
+  //               items: listCategory.map<DropdownMenuItem<String>>((CategoryModel category){
+  //                 return DropdownMenuItem<String>(
+  //                   value: category.id,
+  //                   child: Text(category.name!),
+  //                   onTap: () {
+  //                     categoryId = category.id;
+  //                   },
+  //                 );
+  //               }).toList(), 
+  //             );
+  //           } 
+  //           else if (snapshot.hasError) {
+  //             return Text('Error: ${snapshot.error}'); // Handle errors
+  //           }
+
+  //           // Display a loading indicator while data is being fetched
+  //           return const Center(child: CircularProgressIndicator());
+  //         },
+  //       ),
+  //     ),
+  //   );
+  // }
 
 }

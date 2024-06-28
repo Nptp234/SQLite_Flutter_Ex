@@ -155,8 +155,8 @@ class CategoryPageState extends State<CategoryPage>{
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('${categoryModel.name}', style: TextStyle(fontSize: 25, color: Colors.black, fontWeight: FontWeight.bold),),
-                  Text('${categoryModel.desc}', style: TextStyle(fontSize: 20, color: Colors.grey, fontWeight: FontWeight.normal),),
+                  SizedBox(width: 190, child: Text('${categoryModel.name}', style: TextStyle(fontSize: 25, color: Colors.black, fontWeight: FontWeight.bold),),),
+                  SizedBox(width: 190, child: Text('${categoryModel.desc}', style: TextStyle(fontSize: 20, color: Colors.grey, fontWeight: FontWeight.normal),),),
                 ],
               ),
             ),
@@ -185,6 +185,8 @@ class CategoryPageState extends State<CategoryPage>{
             //action edit
             IconButton(
               onPressed: (){
+                nameController.text = categoryModel.name!;
+                descController.text = categoryModel.desc!;
                 QuickAlert.show(
                   context: context, 
                   type: QuickAlertType.custom,
