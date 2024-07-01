@@ -3,37 +3,77 @@ import 'package:bt_tuan6/models/product.dart';
 import 'dart:developer';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart';
 
-class DatabaseServiceCategory{
+class DatabaseService{
   //singleton
-  static final DatabaseServiceCategory _databaseService = DatabaseServiceCategory._internal();
-  factory DatabaseServiceCategory() => _databaseService;
-  DatabaseServiceCategory._internal();
+  static final DatabaseService _databaseService = DatabaseService._internal();
+  factory DatabaseService() => _databaseService;
+  DatabaseService._internal();
   //
 
   //the database must be initialized before creating any tables or performing read/write operations
   static Database? _database;
   Future<Database> get database async {
-    if (_database != null) return _database!;
-    _database = await initDatabase();
+    if (_database != null){
+      return _database!;
+    }
+
+    await initDatabase();
     return _database!;
   }
 
   //we check if the database is present, if not, we create it using initDatabase() function
-  Future<Database> initDatabase() async {
-    final getDirectory = await getApplicationDocumentsDirectory();
-    String path = '${getDirectory.path}/db_product.db';
-    log(path);
-    return await openDatabase(path, onCreate: _onCreate, version: 2);
+  Future<void> initDatabase() async {
+    try {
+      final getDirectory = await getApplicationDocumentsDirectory();
+      String path = join(getDirectory.path, 'db_product.db');
+      
+      
+      _database = await openDatabase(
+        path,
+        version: 1,
+        onCreate: _onCreate,
+        onOpen: (db) {
+          log('Database opened');
+        },
+      );
+      log('Database initialized');
+      // return _database!;
+    } catch (e) {
+      log('Error initializing database: $e');
+      rethrow;
+    }
   }
 
   //creates the database using  _onCreate() function
   void _onCreate(Database db, int version) async {
-    await db.execute(
-    'CREATE TABLE Category(id TEXT PRIMARY KEY, name TEXT, desc TEXT)');
-    log('TABLE CREATED');
+    try {
+      await db.execute(
+        'CREATE TABLE IF NOT EXISTS Category (id TEXT PRIMARY KEY, name TEXT, desc TEXT);',
+      );
+      log('TABLE CREATED: CATEGORY');
+      await db.execute(
+        'CREATE TABLE IF NOT EXISTS Product (id TEXT PRIMARY KEY, name TEXT, desc TEXT, img TEXT, price TEXT, cateId TEXT);',
+      );
+      log('TABLE CREATED: PRODUCT');
+    } catch (e) {
+      log('Error creating tables: $e');
+      rethrow;
+    }
+  }
+
+  void _onUpgrade(Database db, int version, String path) async{
+    await deleteDatabase(path);
+    _onCreate(db, version);
   }
   //
+
+}
+
+class DatabaseServiceCategory{
+  
+  final DatabaseService _databaseService = DatabaseService();
 
   //get list
   Future<List<CategoryModel>> getCategoyList() async {
@@ -73,35 +113,8 @@ class DatabaseServiceCategory{
 }
 
 class DatabaseServiceProduct{
-  //singleton
-  static final DatabaseServiceProduct _databaseService = DatabaseServiceProduct._internal();
-  factory DatabaseServiceProduct() => _databaseService;
-  DatabaseServiceProduct._internal();
-  //
-
-  //the database must be initialized before creating any tables or performing read/write operations
-  static Database? _database;
-  Future<Database> get database async {
-    if (_database != null) return _database!;
-    _database = await initDatabase();
-    return _database!;
-  }
-
-  //we check if the database is present, if not, we create it using initDatabase() function
-  Future<Database> initDatabase() async {
-    final getDirectory = await getApplicationDocumentsDirectory();
-    String path = '${getDirectory.path}/db_product2.db';
-    log(path);
-    return await openDatabase(path, onCreate: _onCreate, version: 2);
-  }
-
-  //creates the database using  _onCreate() function
-  void _onCreate(Database db, int version) async {
-    await db.execute(
-    'CREATE TABLE Product(id TEXT PRIMARY KEY, name TEXT, desc TEXT, img TEXT, price TEXT, cateId TEXT)');
-    log('TABLE CREATED');
-  }
-  //
+  
+  final DatabaseService _databaseService = DatabaseService();
 
   //get list
   Future<List<ProductModel>> getProductList() async {
